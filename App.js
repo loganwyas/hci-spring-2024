@@ -6,23 +6,20 @@ import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 export default function App() {
   const [facing, setFacing] = useState("back");
   const [permission, requestPermission] = useCameraPermissions();
-  function toggleCameraFacing() {
-    setFacing((current) => (current === "back" ? "front" : "back"));
-  }
 
   return (
     <View style={styles.container}>
       {permission && (
-        <CameraView style={styles.camera} facing={facing}>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={toggleCameraFacing}
-            >
-              <Text style={styles.text}>Flip Camera</Text>
-            </TouchableOpacity>
-          </View>
-        </CameraView>
+        <CameraView
+          style={styles.camera}
+          facing={facing}
+          barcodeScannerSettings={{
+            barcodeTypes: ["qr", "upc_e"],
+          }}
+          onBarcodeScanned={(result) => {
+            console.log(result);
+          }}
+        ></CameraView>
       )}
     </View>
   );

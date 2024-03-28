@@ -14,10 +14,22 @@ export default function App() {
           style={styles.camera}
           facing={facing}
           barcodeScannerSettings={{
-            barcodeTypes: ["qr", "upc_e"],
+            barcodeTypes: ["upc_a"],
           }}
           onBarcodeScanned={(result) => {
-            console.log(result);
+            let api =
+              "https://api.edamam.com/api/food-database/v2/parser?app_id=c2561828&app_key=62f3b9e585d90d6b875af08a312ca2d6&upc=" +
+              result.data;
+            fetch(api, {
+              methods: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                console.log(data);
+              });
           }}
         ></CameraView>
       )}
@@ -32,21 +44,5 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "transparent",
-    margin: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: "flex-end",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
   },
 });

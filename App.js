@@ -50,10 +50,18 @@ export default function App() {
                     scannedItem["weight"] =
                       data["hints"][0]["measures"][1]["weight"] ?? null;
                     setScannedData(scannedItem);
-                    setModalVisible(true);
-                    setOpenCamera(false);
-                    setIsFetching(false);
+                  } else {
+                    setScannedData(null);
                   }
+                  setModalVisible(true);
+                  setOpenCamera(false);
+                  setIsFetching(false);
+                })
+                .catch(() => {
+                  setScannedData(null);
+                  setModalVisible(true);
+                  setOpenCamera(false);
+                  setIsFetching(false);
                 });
             }
           }}
@@ -84,20 +92,41 @@ export default function App() {
                 <Text style={styles.modalText}>
                   Weight: {scannedData["weight"]}
                 </Text>
+                <Pressable
+                  style={styles.button}
+                  onPress={() => setModalVisible(!modalVisible)}
+                >
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.button}
+                  onPress={() => setModalVisible(!modalVisible)}
+                >
+                  <Text style={styles.textStyle}>Add to Inventory</Text>
+                </Pressable>
               </View>
             )}
-            <Pressable
-              style={styles.button}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.textStyle}>Cancel</Text>
-            </Pressable>
-            <Pressable
-              style={styles.button}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.textStyle}>Add to Inventory</Text>
-            </Pressable>
+            {!scannedData && (
+              <View>
+                <Text style={styles.modalText}>
+                  There was an error getting the data. Most likely, the barcode
+                  scanned is not in our database. Please manually enter your
+                  food item.
+                </Text>
+                <Pressable
+                  style={styles.button}
+                  onPress={() => setModalVisible(!modalVisible)}
+                >
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.button}
+                  onPress={() => setModalVisible(!modalVisible)}
+                >
+                  <Text style={styles.textStyle}>Manually Enter Data</Text>
+                </Pressable>
+              </View>
+            )}
           </View>
         </View>
       </Modal>

@@ -6,14 +6,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Inventory from "./Inventory";
 import Camera from "./Camera";
-
-function SettingsScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Settings!</Text>
-    </View>
-  );
-}
+import Settings from "./Settings";
+import Meals from "./Meals";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -37,7 +31,7 @@ function HomeTabs() {
       />
       <Tab.Screen
         name="Meals"
-        component={SettingsScreen}
+        component={Meals}
         options={{
           tabBarLabel: "Meals",
           tabBarIcon: ({ color, size }) => (
@@ -50,10 +44,10 @@ function HomeTabs() {
         }}
       />
       <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
+        name="Profile"
+        component={Settings}
         options={{
-          tabBarLabel: "Settings",
+          tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="account-settings-outline"

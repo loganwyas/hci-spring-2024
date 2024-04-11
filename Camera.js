@@ -1,10 +1,16 @@
 import { CameraView, useCameraPermissions } from "expo-camera/next";
 import { useState } from "react";
-import { Button, StyleSheet, Text, Modal, Pressable, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  Modal,
+  Pressable,
+  View,
+} from "react-native";
 
 export default function Camera() {
   const [openCamera, setOpenCamera] = useState(false);
-  const [permission, requestPermission] = useCameraPermissions();
   const [isFetchingData, setIsFetching] = useState(false);
   const [scannedData, setScannedData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -46,18 +52,21 @@ export default function Camera() {
                   setScannedData(null);
                 }
                 setModalVisible(true);
-                setOpenCamera(false);
                 setIsFetching(false);
               })
               .catch(() => {
                 setScannedData(null);
                 setModalVisible(true);
-                setOpenCamera(false);
                 setIsFetching(false);
               });
           }
         }}
       ></CameraView>
+      {isFetchingData && (
+        <View style={styles.loadingSpinner}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )}
       <Modal
         animationType="slide"
         transparent={true}
@@ -83,18 +92,20 @@ export default function Camera() {
                 <Text style={styles.modalText}>
                   Weight: {scannedData["weight"]}
                 </Text>
-                <Pressable
-                  style={styles.button}
-                  onPress={() => setModalVisible(!modalVisible)}
-                >
-                  <Text style={styles.textStyle}>Cancel</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.button}
-                  onPress={() => setModalVisible(!modalVisible)}
-                >
-                  <Text style={styles.textStyle}>Add to Inventory</Text>
-                </Pressable>
+                <View style={styles.row}>
+                  <Pressable
+                    style={styles.button}
+                    onPress={() => setModalVisible(!modalVisible)}
+                  >
+                    <Text style={styles.buttonText}>Cancel</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.button}
+                    onPress={() => setModalVisible(!modalVisible)}
+                  >
+                    <Text style={styles.buttonText}>Add to Inventory</Text>
+                  </Pressable>
+                </View>
               </View>
             )}
             {!scannedData && (
@@ -104,18 +115,20 @@ export default function Camera() {
                   scanned is not in our database. Please manually enter your
                   food item.
                 </Text>
-                <Pressable
-                  style={styles.button}
-                  onPress={() => setModalVisible(!modalVisible)}
-                >
-                  <Text style={styles.textStyle}>Cancel</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.button}
-                  onPress={() => setModalVisible(!modalVisible)}
-                >
-                  <Text style={styles.textStyle}>Manually Enter Data</Text>
-                </Pressable>
+                <View style={styles.row}>
+                  <Pressable
+                    style={styles.button}
+                    onPress={() => setModalVisible(!modalVisible)}
+                  >
+                    <Text style={styles.textStyle}>Cancel</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.button}
+                    onPress={() => setModalVisible(!modalVisible)}
+                  >
+                    <Text style={styles.textStyle}>Manually Enter Data</Text>
+                  </Pressable>
+                </View>
               </View>
             )}
           </View>
@@ -143,7 +156,7 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
-    padding: 35,
+    padding: 25,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -158,11 +171,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     elevation: 2,
-    marginTop: 10,
-    marginBottom: 10,
+    margin: 10,
     backgroundColor: "#2196F3",
   },
-  textStyle: {
+  buttonText: {
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
@@ -170,5 +182,19 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
+  },
+  loadingSpinner: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  row: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
   },
 });

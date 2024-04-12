@@ -9,11 +9,16 @@ import {
   View,
 } from "react-native";
 
-export default function Camera() {
+export default function Camera({ navigation: { navigate } }) {
   const [openCamera, setOpenCamera] = useState(false);
   const [isFetchingData, setIsFetching] = useState(false);
   const [scannedData, setScannedData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+  function goToManualEntry() {
+    setModalVisible(false);
+    navigate("Add New Item");
+  }
 
   return (
     <View style={styles.container}>

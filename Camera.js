@@ -9,11 +9,16 @@ import {
   View,
 } from "react-native";
 
-export default function Camera() {
+export default function Camera({ navigation: { navigate } }) {
   const [openCamera, setOpenCamera] = useState(false);
   const [isFetchingData, setIsFetching] = useState(false);
   const [scannedData, setScannedData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+  function goToManualEntry() {
+    setModalVisible(false);
+    navigate("Add New Item");
+  }
 
   return (
     <View style={styles.container}>
@@ -72,7 +77,7 @@ export default function Camera() {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          setModalVisible(!modalVisible);
+          setModalVisible(false);
         }}
       >
         <View style={styles.centeredView}>
@@ -95,13 +100,13 @@ export default function Camera() {
                 <View style={styles.row}>
                   <Pressable
                     style={styles.button}
-                    onPress={() => setModalVisible(!modalVisible)}
+                    onPress={() => setModalVisible(false)}
                   >
                     <Text style={styles.buttonText}>Cancel</Text>
                   </Pressable>
                   <Pressable
                     style={styles.button}
-                    onPress={() => setModalVisible(!modalVisible)}
+                    onPress={() => setModalVisible(false)}
                   >
                     <Text style={styles.buttonText}>Add to Inventory</Text>
                   </Pressable>
@@ -118,13 +123,13 @@ export default function Camera() {
                 <View style={styles.row}>
                   <Pressable
                     style={styles.button}
-                    onPress={() => setModalVisible(!modalVisible)}
+                    onPress={() => setModalVisible(false)}
                   >
                     <Text style={styles.textStyle}>Cancel</Text>
                   </Pressable>
                   <Pressable
                     style={styles.button}
-                    onPress={() => setModalVisible(!modalVisible)}
+                    onPress={() => goToManualEntry()}
                   >
                     <Text style={styles.textStyle}>Manually Enter Data</Text>
                   </Pressable>

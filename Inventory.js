@@ -15,7 +15,7 @@ export default function Inventory({ navigation: { navigate } }) {
   return (
     <View>
       <View style={styles.row}>
-        <Button title="Add Manually" />
+        <Button title="Add Manually" onPress={() => navigate("Add New Item")} />
         <Button title="Add with Barcode" onPress={startScanning} />
       </View>
     </View>

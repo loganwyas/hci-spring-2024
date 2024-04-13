@@ -8,6 +8,7 @@ import Inventory from "./Inventory";
 import Camera from "./Camera";
 import Settings from "./Settings";
 import Meals from "./Meals";
+import NewInventoryItem from "./NewInventoryItem";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -71,6 +72,7 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="Barcode Scanner" component={Camera} />
+        <Stack.Screen name="Add New Item" component={NewInventoryItem} />
       </Stack.Navigator>
     </NavigationContainer>
   );

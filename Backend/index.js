@@ -24,7 +24,7 @@ MongoClient.connect(CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopolo
     database = client.db(DATABASESNAME);
     console.log("Successfully connected to MongoDB");
 
-    // Start the server
+    //Start the server
     server = app.listen(5038, () => {
       console.log("Server is running on port 5038");
     });
@@ -38,9 +38,33 @@ MongoClient.connect(CONNECTION_STRING, { useNewUrlParser: true, useUnifiedTopolo
 });
 
 
-// this get request is for login
-app.get('/api/user/userBarrcode', (request, response) => {
-  database.collection('UserData').find({ 
+
+// this post request is for creating user account
+app.post('/api/user/userCredentials', multer().none(), (request, response) => {
+  database.collection("UserCredentials").countDocuments({}, (error, numofDocs) => {
+      if (error) {
+          console.error("Error counting documents:", error);
+          response.status(500).send("Internal Server Error");
+      } else {
+          const body = request.body;
+
+          database.collection("UserCredentials").insertOne(body, (insertError) => {
+              if (insertError) {
+                  console.error("Error adding :", insertError);
+                  response.status(500).send("Internal Server Error");
+              } else {
+                  console.log(body);
+                  response.json(" added successfully");
+              }
+          });
+      }
+  });
+});
+
+
+// this get request is for getting user profile 
+app.get('/api/user/userProfile', (request, response) => {
+  database.collection('UserCredentials').find({ 
   }).toArray((error, result) => {
     if (error) {
       console.error('Error retrieving data from MongoDB:', error);
@@ -52,8 +76,10 @@ app.get('/api/user/userBarrcode', (request, response) => {
   });
 });
 
-// this post request is for signin
-app.post('/api/user/userdata', multer().none(), (request, response) => {
+
+// In Inventory, click barcodescanner to add new meal item
+// this post request is for creating the meals data to database 
+app.post('/api/user/userMeals', multer().none(), (request, response) => {
     database.collection("UserData").countDocuments({}, (error, numofDocs) => {
         if (error) {
             console.error("Error counting documents:", error);
@@ -73,6 +99,58 @@ app.post('/api/user/userdata', multer().none(), (request, response) => {
         }
     });
 });
+
+//this get request is for getting the user meals to get to screen
+app.get('/api/user/usermeals', (request, response) => {
+  database.collection('UserData').find({ 
+  }).toArray((error, result) => {
+    if (error) {
+      console.error('Error retrieving data from MongoDB:', error);
+      response.status(500).send('Internal Server Error');
+    } else {
+      // Send the result as a response
+      response.send(result);
+    }
+  });
+});
+
+//this get request is for getting the user sorted meals like breakfast, lunch, dinner
+app.get('/api/user/userTypeMeals', (request, response) => {
+  database.collection('UserData').find({ 
+  }).toArray((error, result) => {
+    if (error) {
+      console.error('Error retrieving data from MongoDB:', error);
+      response.status(500).send('Internal Server Error');
+    } else {
+      // Send the result as a response
+      response.send(result);
+    }
+  });
+});
+
+
+//This post request is for Adding new meal PRODUCT item manually
+app.post('/api/user/userDataManually', multer().none(), (request, response) => {
+  database.collection("NewMealItem").countDocuments({}, (error, numofDocs) => {
+      if (error) {
+          console.error("Error counting documents:", error);
+          response.status(500).send("Internal Server Error");
+      } else {
+          const body = request.body;
+
+          database.collection("NewMealItem").insertOne(body, (insertError) => {
+              if (insertError) {
+                  console.error("Error adding :", insertError);
+                  response.status(500).send("Internal Server Error");
+              } else {
+                  console.log(body);
+                  response.json(" added successfully");
+              }
+          });
+      }
+  });
+});
+
 
 
 

@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Button, StyleSheet, Text, Modal, Pressable, View } from "react-native";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  Pressable,
+  View,
+} from "react-native";
+import { useForm, Controller } from "react-hook-form";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -63,17 +71,90 @@ function HomeTabs() {
 }
 
 export default function App() {
+  const [phoneNumber, setPhoneNumber] = useState(null);
+
+  function Login() {
+    const {
+      control,
+      handleSubmit,
+      formState: { errors },
+    } = useForm();
+    const onSubmit = (data) => {
+      console.log(data.phone);
+      setPhoneNumber(data.phone);
+    };
+
+    return (
+      <View style={styles.container}>
+        <Controller
+          control={control}
+          render={({ field: { value, onChange, onBlur } }) => (
+            <TextInput
+              placeholder="Phone Number"
+              style={styles.input}
+              keyboardType="numeric"
+              maxLength={10}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+            />
+          )}
+          name="phone"
+          rules={{
+            required: "You must enter your phone number to get your data",
+          }}
+        />
+        {errors.phone && (
+          <Text style={styles.errorText}>{errors.phone.message}</Text>
+        )}
+
+        <Button title="Get Started" onPress={handleSubmit(onSubmit)} />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={HomeTabs}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="Barcode Scanner" component={Camera} />
-        <Stack.Screen name="Add New Item" component={NewInventoryItem} />
+        {phoneNumber && (
+          <>
+            <Stack.Screen
+              name="Home"
+              component={HomeTabs}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="Barcode Scanner" component={Camera} />
+            <Stack.Screen name="Add New Item" component={NewInventoryItem} />
+          </>
+        )}
+        {!phoneNumber && (
+          <>
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={{ headerShown: false }}
+            />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 50,
+    paddingTop: 100,
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 8,
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+  },
+});

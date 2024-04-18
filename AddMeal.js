@@ -9,100 +9,139 @@ import {
   Text,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
 
-export default function AddMeal() {
-  const [mealName, setMealName] = useState("");
-  const [mealDate, setMealDate] = useState("");
-  const [mealType, setMealType] = useState("");
+export default function AddMeal({ navigation: { navigate } }) {
+  const [mealDate, setMealDate] = useState(new Date());
+  const [mealType, setMealType] = useState("Breakfast");
   const [itemsConsumed, setItemsConsumed] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const mealTypes = ["Breakfast", "Lunch", "Dinner"];
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  function addMeal() {
-    // Save the meal data here
-    console.log("Meal data:", {
-      mealName,
-      mealDate,
-      mealType,
-      itemsConsumed,
-    });
-  }
+  const onSubmit = (data) => {
+    data["date"] = mealDate;
+    data["type"] = mealType;
+    navigate("Meals", { meal: data });
+  };
 
-  function handleItemNameChange(index, name) {
-    const updatedItems = [...itemsConsumed];
-    updatedItems[index].name = name;
-    setItemsConsumed(updatedItems);
-  }
-
-  function handleItemQuantityChange(index, quantity) {
-    const updatedItems = [...itemsConsumed];
-    updatedItems[index].quantity = quantity;
-    setItemsConsumed(updatedItems);
-  }
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate;
+    setMealDate(currentDate);
+  };
 
   function addItem() {
-    setItemsConsumed([...itemsConsumed, { name: "", quantity: "" }]);
+    setItemsConsumed([...itemsConsumed, "Item"]);
   }
 
   return (
     <ScrollView>
       <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Meal Name"
-          value={mealName}
-          onChangeText={(text) => setMealName(text)}
+        <Controller
+          control={control}
+          render={({ field: { value, onChange, onBlur } }) => (
+            <TextInput
+              placeholder="Meal Name"
+              style={styles.input}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+            />
+          )}
+          name="name"
+          rules={{ required: "You must enter the name of the meal" }}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Date Consumed"
-          value={mealDate}
-          onChangeText={(text) => setMealDate(text)}
-        />
+        {errors.name && (
+          <Text style={styles.errorText}>{errors.name.message}</Text>
+        )}
+
+        <View style={styles.row}>
+          <Text>Date Consumed: </Text>
+          <DateTimePicker value={mealDate} mode="date" onChange={onChange} />
+        </View>
+
+        <Text>Meal Type:</Text>
         <TouchableOpacity
           style={styles.dropdown}
           onPress={() => setShowDropdown(!showDropdown)}
         >
-          <Text style={styles.dropdownText}>
-            {mealType || "Select meal type"}
-          </Text>
+          <Text style={styles.dropdownText}>{mealType}</Text>
         </TouchableOpacity>
         {showDropdown && (
-          <View style={styles.dropdownContainer}>
-            {mealTypes.map((type, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.dropdownItem}
-                onPress={() => {
-                  console.log("Selected meal type:", type);
-                  setMealType(type === "Select meal type" ? "" : type);
-                  setShowDropdown(false);
-                }}
-              >
-                <Text>{type}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <Picker
+            selectedValue={mealType}
+            onValueChange={(itemValue, itemIndex) => setMealType(itemValue)}
+          >
+            <Picker.Item label="Breakfast" value="Breakfast" />
+            <Picker.Item label="Lunch" value="Lunch" />
+            <Picker.Item label="Dinner" value="Dinner" />
+          </Picker>
         )}
-        {itemsConsumed.map((item, index) => (
-          <View key={index} style={styles.itemContainer}>
-            <TextInput
-              style={styles.inputItem}
-              placeholder={`Item ${index + 1} Name`}
-              value={item.name}
-              onChangeText={(text) => handleItemNameChange(index, text)}
-            />
-            <TextInput
-              style={styles.inputItem}
-              placeholder={`Item ${index + 1} Quantity`}
-              value={item.quantity}
-              onChangeText={(text) => handleItemQuantityChange(index, text)}
-            />
-          </View>
-        ))}
+        {itemsConsumed.map((item, index) => {
+          let nameId = `itemName${index + 1}`;
+          let nameLabel = `Item ${index + 1} Name`;
+          let quantityId = `itemQuantity${index + 1}`;
+          let quantityLabel = `Item ${index + 1} Quantity`;
+          return (
+            <View key={index}>
+              <View style={styles.itemContainer}>
+                <Controller
+                  control={control}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <TextInput
+                      placeholder={nameLabel}
+                      style={styles.input}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                    />
+                  )}
+                  name={nameId}
+                  rules={{
+                    required: `You must enter the name/quantity of item ${
+                      index + 1
+                    }`,
+                  }}
+                />
+
+                <Controller
+                  control={control}
+                  render={({ field: { value, onChange, onBlur } }) => (
+                    <TextInput
+                      placeholder={quantityLabel}
+                      style={styles.input}
+                      keyboardType="numeric"
+                      maxLength={2}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                    />
+                  )}
+                  name={quantityId}
+                  rules={{
+                    required: `You must enter the name/quantity of item ${
+                      index + 1
+                    }`,
+                  }}
+                />
+              </View>
+              {(errors[nameId] || errors[quantityId]) && (
+                <Text
+                  style={styles.errorText}
+                >{`You must enter the name/quantity of item ${
+                  index + 1
+                }`}</Text>
+              )}
+            </View>
+          );
+        })}
         <Button title="Add Item" onPress={addItem} />
-        <Button title="Save Meal" onPress={addMeal} />
+        <Button title="Save Meal" onPress={handleSubmit(onSubmit)} />
       </View>
     </ScrollView>
   );
@@ -121,7 +160,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     marginBottom: 10,
   },
   inputItem: {
@@ -152,5 +191,15 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "gray",
+  },
+  row: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    paddingBottom: 10,
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
   },
 });

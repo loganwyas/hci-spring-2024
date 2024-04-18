@@ -1,0 +1,3 @@
+- To start frontend, run "npx expo start"
+- To start backend, go into the "Backend" folder and run "node index.js"
+- To allow the backend to connect to the frontend, run "lt --port 5038 --host http://loca.lt --subdomain application-mock-server"

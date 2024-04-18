@@ -16,7 +16,14 @@ export default function NewInventoryItem({ navigation: { navigate } }) {
   } = useForm();
 
   const onSubmit = (data) => {
-    navigate("Inventory", { item: data });
+    let item = {
+      name: data.name,
+      calories: data.calories * data.servings,
+      sugar: data.sugar * data.servings,
+      fat: data.fat * data.servings,
+      weight: data.servings * data.size,
+    };
+    navigate("Inventory", { item: item });
   };
 
   return (

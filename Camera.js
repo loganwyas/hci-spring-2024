@@ -20,6 +20,11 @@ export default function Camera({ navigation: { navigate } }) {
     navigate("Add New Item");
   }
 
+  function addItem() {
+    setModalVisible(false);
+    navigate("Inventory", { item: scannedData });
+  }
+
   return (
     <View style={styles.container}>
       <CameraView
@@ -104,10 +109,7 @@ export default function Camera({ navigation: { navigate } }) {
                   >
                     <Text style={styles.buttonText}>Cancel</Text>
                   </Pressable>
-                  <Pressable
-                    style={styles.button}
-                    onPress={() => setModalVisible(false)}
-                  >
+                  <Pressable style={styles.button} onPress={() => addItem()}>
                     <Text style={styles.buttonText}>Add to Inventory</Text>
                   </Pressable>
                 </View>

@@ -1,7 +1,9 @@
 import { Button, StyleSheet, View } from "react-native";
 
-export default function Meals() {
-  function addMeal() {}
+export default function Meals({ navigation: { navigate } }) {
+  function addMeal() {
+    navigate("Create Meal");
+  }
 
   return (
     <View>

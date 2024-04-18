@@ -1,26 +1,35 @@
 import { CameraView, useCameraPermissions } from "expo-camera/next";
 import { useState } from "react";
-import { Button, StyleSheet, View } from "react-native";
-import Constants from "expo-constants";
-const { manifest2 } = Constants;
+import { Button, StyleSheet, View, Text, ScrollView } from "react-native";
 
 const api = "https://application-mock-server.loca.lt";
 
-export default function Inventory({ navigation: { navigate } }) {
+export default function Inventory({ route, navigation: { navigate } }) {
   const [permission, requestPermission] = useCameraPermissions();
+  const { item } = route.params ?? { item: null };
+  const [items, setItems] = useState([]);
 
-  const url = "https://application-mock-server.loca.lt/api/user/usermeals";
-  const getItemsFromApiAsync = async () => {
-    try {
-      const response = await fetch(url);
-      const json = await response.json();
-      console.log(json);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  if (item && items.indexOf(item) == -1) {
+    const url =
+      "https://application-mock-server.loca.lt/api/user/userDataManually";
+    const addItemToApiAsync = async () => {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(item),
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-  getItemsFromApiAsync();
+    addItemToApiAsync();
+    setItems([...items, item]);
+  }
 
   async function startScanning() {
     await requestPermission();
@@ -30,12 +39,24 @@ export default function Inventory({ navigation: { navigate } }) {
   }
 
   return (
-    <View>
+    <ScrollView>
       <View style={styles.row}>
         <Button title="Add Manually" onPress={() => navigate("Add New Item")} />
         <Button title="Add with Barcode" onPress={startScanning} />
       </View>
-    </View>
+      {items &&
+        items.map((item, index) => (
+          <View style={styles.container} key={index}>
+            <Text style={styles.bigText}>{item.name}</Text>
+            <Text style={styles.smallerText}>
+              Calories: {item.calories} calories
+            </Text>
+            <Text style={styles.smallerText}>Fat: {item.fat} grams</Text>
+            <Text style={styles.smallerText}>Sugar: {item.sugar} grams</Text>
+            <Text style={styles.smallerText}>Weight: {item.weight} grams</Text>
+          </View>
+        ))}
+    </ScrollView>
   );
 }
 
@@ -44,5 +65,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
+  },
+  bigText: {
+    fontSize: 20,
+  },
+  smallerText: {
+    fontSize: 16,
+  },
+  container: {
+    padding: 20,
   },
 });

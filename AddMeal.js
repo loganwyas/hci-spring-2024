@@ -25,8 +25,9 @@ export default function AddMeal({ navigation: { navigate } }) {
   } = useForm();
 
   const onSubmit = (data) => {
-    data["date"] = mealDate;
+    data["date"] = mealDate.toLocaleDateString();
     data["type"] = mealType;
+    console.log(data);
     navigate("Meals", { meal: data });
   };
 

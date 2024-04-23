@@ -1,27 +1,39 @@
 import { useState } from "react";
-import { Button, StyleSheet, View, Text, ScrollView } from "react-native";
+import {
+  Button,
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 
 export default function Meals({ route, navigation: { navigate } }) {
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const { meal } = route.params ?? { meal: null };
   const [meals, setMeals] = useState([]);
+  const [gottenMeals, setGottenMeals] = useState(false);
 
-  const geturl = "https://application-mock-server.loca.lt/api/user/usermeals";
+  const geturl = apiUrl + "/api/user/usermeals";
   const getMealsAsync = async () => {
     try {
       const response = await fetch(geturl);
       const json = await response.json();
       if (json) {
         setMeals(json);
+        setGottenMeals(true);
       }
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
-  getMealsAsync();
+  if (!gottenMeals) {
+    getMealsAsync();
+  }
 
   if (meal && meals.indexOf(meal) == -1) {
-    const url = "https://application-mock-server.loca.lt/api/user/userMeals";
+    const url = apiUrl + "/api/user/userMeals";
     const addMealToApiAsync = async () => {
       try {
         const response = await fetch(url, {
@@ -33,7 +45,7 @@ export default function Meals({ route, navigation: { navigate } }) {
           body: JSON.stringify(meal),
         });
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 
@@ -48,7 +60,13 @@ export default function Meals({ route, navigation: { navigate } }) {
           onPress={() => navigate("Create Meal")}
         />
       </View>
-      {meals &&
+      {!gottenMeals && (
+        <View style={styles.loadingSpinner}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      )}
+      {gottenMeals &&
+        meals &&
         meals.map((meal, index) => (
           <View style={styles.container} key={index}>
             <Text style={styles.bigText}>{meal.name}</Text>
@@ -74,5 +92,15 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
+  },
+  loadingSpinner: {
+    marginTop: 100,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

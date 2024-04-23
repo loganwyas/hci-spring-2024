@@ -5,13 +5,13 @@ import { Button, StyleSheet, View, Text, ScrollView } from "react-native";
 const api = "https://application-mock-server.loca.lt";
 
 export default function Inventory({ route, navigation: { navigate } }) {
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const [permission, requestPermission] = useCameraPermissions();
   const { item } = route.params ?? { item: null };
   const [items, setItems] = useState([]);
 
   if (item && items.indexOf(item) == -1) {
-    const url =
-      "https://application-mock-server.loca.lt/api/user/userDataManually";
+    const url = apiUrl + "/api/user/userDataManually";
     const addItemToApiAsync = async () => {
       try {
         const response = await fetch(url, {

@@ -14,7 +14,7 @@ export default function Meals({ route, navigation: { navigate } }) {
   const [meals, setMeals] = useState([]);
   const [gottenMeals, setGottenMeals] = useState(false);
 
-  const geturl = apiUrl + "/api/user/usermeals";
+  const geturl = apiUrl + "/api/getMeals";
   const getMealsAsync = async () => {
     try {
       const response = await fetch(geturl);
@@ -33,7 +33,7 @@ export default function Meals({ route, navigation: { navigate } }) {
   }
 
   if (meal && meals.indexOf(meal) == -1) {
-    const url = apiUrl + "/api/user/userMeals";
+    const url = apiUrl + "/api/createMeal";
     const addMealToApiAsync = async () => {
       try {
         const response = await fetch(url, {
@@ -67,13 +67,37 @@ export default function Meals({ route, navigation: { navigate } }) {
       )}
       {gottenMeals &&
         meals &&
-        meals.map((meal, index) => (
-          <View style={styles.container} key={index}>
-            <Text style={styles.bigText}>{meal.name}</Text>
-            <Text style={styles.smallerText}>Type: {meal.type}</Text>
-            <Text style={styles.smallerText}>Date: {meal.date}</Text>
-          </View>
-        ))}
+        meals.map((meal, index) => {
+          let items = [];
+          let i = 1;
+          while (meal["itemName" + i.toString()]) {
+            items.push(
+              <Text key={index + "-item" + i.toString()}>
+                {meal["itemName" + i.toString()]} -{" "}
+                {meal["itemQuantity" + i.toString()]} grams
+              </Text>
+            );
+            i += 1;
+          }
+          if (meal["items"]) {
+            for (let x = 0; x < meal["items"].length; x++) {
+              items.push(
+                <Text key={index + "-item" + x.toString()}>
+                  {meal["items"][x]["name"]} -{" "}
+                  {meal["itemQuantity" + (x + 1).toString()]} grams
+                </Text>
+              );
+            }
+          }
+          return (
+            <View style={styles.container} key={index}>
+              <Text style={styles.bigText}>{meal.name}</Text>
+              <Text style={styles.smallerText}>Type: {meal.type}</Text>
+              <Text style={styles.smallerText}>Date: {meal.date}</Text>
+              {items}
+            </View>
+          );
+        })}
     </ScrollView>
   );
 }

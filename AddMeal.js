@@ -13,10 +13,32 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
 
 export default function AddMeal({ navigation: { navigate } }) {
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const [mealDate, setMealDate] = useState(new Date());
   const [mealType, setMealType] = useState("Breakfast");
   const [itemsConsumed, setItemsConsumed] = useState([]);
+  const [itemDropdowns, setItemDropdowns] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [allItems, setAllItems] = useState([]);
+  const [gottenAllItems, setGottenAllItems] = useState(false);
+
+  const geturl = apiUrl + "/api/getItems";
+  const getItemsAsync = async () => {
+    try {
+      const response = await fetch(geturl);
+      const json = await response.json();
+      if (json) {
+        setAllItems(json);
+        setGottenAllItems(true);
+      }
+    } catch (error) {
+      // console.error(error);
+    }
+  };
+
+  if (!gottenAllItems) {
+    getItemsAsync();
+  }
 
   const {
     control,
@@ -27,7 +49,7 @@ export default function AddMeal({ navigation: { navigate } }) {
   const onSubmit = (data) => {
     data["date"] = mealDate.toLocaleDateString();
     data["type"] = mealType;
-    console.log(data);
+    data["items"] = itemsConsumed;
     navigate("Meals", { meal: data });
   };
 
@@ -37,7 +59,11 @@ export default function AddMeal({ navigation: { navigate } }) {
   };
 
   function addItem() {
-    setItemsConsumed([...itemsConsumed, "Item"]);
+    setItemDropdowns([...itemDropdowns, false]);
+    setItemsConsumed([
+      ...itemsConsumed,
+      allItems ? allItems[0] : { _id: "-1", name: "No Items Available" },
+    ]);
   }
 
   return (
@@ -83,64 +109,87 @@ export default function AddMeal({ navigation: { navigate } }) {
             <Picker.Item label="Dinner" value="Dinner" />
           </Picker>
         )}
-        {itemsConsumed.map((item, index) => {
-          let nameId = `itemName${index + 1}`;
-          let nameLabel = `Item ${index + 1} Name`;
-          let quantityId = `itemQuantity${index + 1}`;
-          let quantityLabel = `Item ${index + 1} Quantity`;
-          return (
-            <View key={index}>
-              <View style={styles.itemContainer}>
-                <Controller
-                  control={control}
-                  render={({ field: { value, onChange, onBlur } }) => (
-                    <TextInput
-                      placeholder={nameLabel}
-                      style={styles.input}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                    />
-                  )}
-                  name={nameId}
-                  rules={{
-                    required: `You must enter the name/quantity of item ${
-                      index + 1
-                    }`,
-                  }}
-                />
+        {itemDropdowns &&
+          itemDropdowns.map((item, index) => {
+            let quantityId = `itemQuantity${index + 1}`;
+            let quantityLabel = `Item ${index + 1} Quantity (grams)`;
+            return (
+              <View key={index}>
+                <View style={styles.itemContainer}>
+                  <View style={styles.item}>
+                    <TouchableOpacity
+                      style={styles.dropdown}
+                      onPress={() =>
+                        setItemDropdowns([
+                          ...itemDropdowns.slice(0, index),
+                          !item,
+                          ...itemDropdowns.slice(index + 1),
+                        ])
+                      }
+                    >
+                      <Text style={styles.dropdownText}>
+                        {`${itemsConsumed[index]["name"]} (${itemsConsumed[index]["_id"]})`}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
 
-                <Controller
-                  control={control}
-                  render={({ field: { value, onChange, onBlur } }) => (
-                    <TextInput
-                      placeholder={quantityLabel}
-                      style={styles.input}
-                      keyboardType="numeric"
-                      maxLength={2}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                    />
-                  )}
-                  name={quantityId}
-                  rules={{
-                    required: `You must enter the name/quantity of item ${
-                      index + 1
-                    }`,
-                  }}
-                />
+                  <Controller
+                    control={control}
+                    render={({ field: { value, onChange, onBlur } }) => (
+                      <TextInput
+                        placeholder={quantityLabel}
+                        style={[styles.input, styles.item]}
+                        keyboardType="numeric"
+                        maxLength={2}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                      />
+                    )}
+                    name={quantityId}
+                    rules={{
+                      required: `You must enter the quantity of item ${
+                        index + 1
+                      }`,
+                    }}
+                  />
+                </View>
+                {item && (
+                  <Picker
+                    selectedValue={`${itemsConsumed[index]["name"]} (${itemsConsumed[index]["_id"]})`}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setItemsConsumed([
+                        ...itemsConsumed.slice(0, index),
+                        allItems[itemIndex],
+                        ...itemsConsumed.slice(index + 1),
+                      ])
+                    }
+                  >
+                    {allItems &&
+                      allItems.map((item) => {
+                        return (
+                          <Picker.Item
+                            label={item["name"]}
+                            value={`${item["name"]} (${item["_id"]})`}
+                          />
+                        );
+                      })}
+                    {!allItems && (
+                      <Picker.Item
+                        label="No Items Available"
+                        value="No Items Available"
+                      />
+                    )}
+                  </Picker>
+                )}
+                {errors[quantityId] && (
+                  <Text style={styles.errorText}>
+                    {errors[quantityId].message}
+                  </Text>
+                )}
               </View>
-              {(errors[nameId] || errors[quantityId]) && (
-                <Text
-                  style={styles.errorText}
-                >{`You must enter the name/quantity of item ${
-                  index + 1
-                }`}</Text>
-              )}
-            </View>
-          );
-        })}
+            );
+          })}
         <Button title="Add Item" onPress={addItem} />
         <Button title="Save Meal" onPress={handleSubmit(onSubmit)} />
       </View>
@@ -164,15 +213,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     marginBottom: 10,
   },
-  inputItem: {
-    width: "45%",
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    paddingHorizontal: 10,
-  },
   dropdown: {
     height: 40,
+    width: "100%",
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 10,
@@ -185,7 +228,6 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     borderColor: "gray",
     borderWidth: 1,
-    paddingHorizontal: 10,
     marginTop: -1,
   },
   dropdownItem: {
@@ -202,5 +244,8 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginBottom: 10,
+  },
+  item: {
+    width: "50%",
   },
 });

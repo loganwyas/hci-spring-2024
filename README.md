@@ -1,3 +1,6 @@
 - To start frontend, run "npx expo start"
 - To start backend, go into the "Backend" folder and run "node index.js"
-- To allow the backend to connect to the frontend, run "lt --port 5038 --host http://loca.lt --subdomain application-mock-server"
+- To allow the backend to connect to the frontend:
+  - Use ngrok to create a public url for the api
+  - Create a ".env" file
+  - Add "EXPO_PUBLIC_API_URL=$URL", replacing "$URL" with the public url that you created earlier

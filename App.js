@@ -81,7 +81,6 @@ export default function App() {
       formState: { errors },
     } = useForm();
     const onSubmit = (data) => {
-      console.log(data.phone);
       setPhoneNumber(data.phone);
     };
 

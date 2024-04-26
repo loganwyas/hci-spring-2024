@@ -1,18 +1,105 @@
-import { Button, Text, StyleSheet, View } from "react-native";
+import { useState } from "react";
+import {
+  Button,
+  Text,
+  StyleSheet,
+  View,
+  ActivityIndicator,
+} from "react-native";
 
 export default function Settings() {
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  const [meals, setMeals] = useState([]);
+  const [gottenMeals, setGottenMeals] = useState(false);
+
+  const geturl = apiUrl + "/api/getMeals";
+  const getMealsAsync = async () => {
+    try {
+      const response = await fetch(geturl);
+      const json = await response.json();
+      if (json) {
+        setMeals(json);
+        setGottenMeals(true);
+      }
+    } catch (error) {}
+  };
+
+  if (!gottenMeals) {
+    getMealsAsync();
+  }
+
+  function calculateValue(property) {
+    let value = 0;
+    for (let i = 0; i < meals.length; i++) {
+      if (meals[i]["items"]) {
+        for (let x = 0; x < meals[i]["items"].length; x++) {
+          let quantity = Number(meals[i]["itemQuantity" + (x + 1).toString()]);
+          let item = meals[i]["items"][x];
+          let val = (item[property] / item["weight"]) * quantity;
+          value += Math.round(val);
+        }
+      }
+    }
+    return value;
+  }
+
+  function countMeals(type) {
+    let count = 0;
+    for (let i = 0; i < meals.length; i++) {
+      if (meals[i]["type"] == type) count += 1;
+    }
+    return count;
+  }
+
   return (
     <View>
-      <View style={styles.row}>
-        <View style={styles.item}>
-          <Text style={[styles.bigText, styles.centered]}>3</Text>
-          <Text style={styles.centered}>Meals Added</Text>
+      {!gottenMeals && (
+        <View style={styles.loadingSpinner}>
+          <ActivityIndicator size="large" color="#0000ff" />
         </View>
-        <View style={styles.item}>
-          <Text style={[styles.bigText, styles.centered]}>5904</Text>
-          <Text style={styles.centered}>Calories Consumed</Text>
+      )}
+      {gottenMeals && (
+        <View>
+          <Text style={[styles.biggestText, styles.centered]}>
+            Total Consumed
+          </Text>
+          <View style={styles.row}>
+            <View style={styles.item}>
+              <Text style={[styles.bigText, styles.centered]}>
+                {calculateValue("calories")}
+              </Text>
+              <Text style={styles.centered}>Calories</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={[styles.bigText, styles.centered]}>
+                {calculateValue("sugar")} g
+              </Text>
+              <Text style={styles.centered}>Sugar</Text>
+            </View>
+            <View style={styles.item}>
+              <Text style={[styles.bigText, styles.centered]}>
+                {calculateValue("fat")} g
+              </Text>
+              <Text style={styles.centered}>Fat</Text>
+            </View>
+          </View>
+          <View style={styles.row}></View>
+          <Text style={[styles.biggestText, styles.centered]}>
+            {meals.length} Meals Eaten
+          </Text>
+          <View>
+            <Text style={[styles.bigText, styles.centered]}>
+              {countMeals("Breakfast")} Breakfasts
+            </Text>
+            <Text style={[styles.bigText, styles.centered]}>
+              {countMeals("Lunch")} Lunches
+            </Text>
+            <Text style={[styles.bigText, styles.centered]}>
+              {countMeals("Dinner")} Dinners
+            </Text>
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 }
@@ -27,10 +114,26 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   bigText: {
-    fontSize: 30,
+    fontSize: 25,
+    fontWeight: 700,
+    marginTop: 10,
+  },
+  biggestText: {
+    fontSize: 35,
     fontWeight: "bold",
+    marginTop: 15,
   },
   centered: {
     textAlign: "center",
+  },
+  loadingSpinner: {
+    marginTop: 100,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

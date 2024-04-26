@@ -52,11 +52,13 @@ export default function Camera({ navigation: { navigate } }) {
                   let food = data["hints"][0]["food"];
                   let nutrients = food["nutrients"];
                   scannedItem["name"] = food["label"] ?? "Unknown";
-                  scannedItem["calories"] = nutrients["ENERC_KCAL"] ?? null;
-                  scannedItem["sugar"] = nutrients["SUGAR"] ?? null;
-                  scannedItem["fat"] = nutrients["FAT"] ?? null;
+                  scannedItem["calories"] =
+                    Math.round(nutrients["ENERC_KCAL"]) ?? null;
+                  scannedItem["sugar"] = Math.round(nutrients["SUGAR"]) ?? null;
+                  scannedItem["fat"] = Math.round(nutrients["FAT"]) ?? null;
                   scannedItem["weight"] =
-                    data["hints"][0]["measures"][1]["weight"] ?? null;
+                    Math.round(data["hints"][0]["measures"][1]["weight"]) ??
+                    null;
                   setScannedData(scannedItem);
                 } else {
                   setScannedData(null);
@@ -93,14 +95,16 @@ export default function Camera({ navigation: { navigate } }) {
                   Name: "{scannedData["name"]}"
                 </Text>
                 <Text style={styles.modalText}>
-                  Calories: {scannedData["calories"]}
+                  Calories: {scannedData["calories"]} calories
                 </Text>
                 <Text style={styles.modalText}>
-                  Sugar: {scannedData["sugar"]}
+                  Sugar: {scannedData["sugar"]} grams
                 </Text>
-                <Text style={styles.modalText}>Fat: {scannedData["fat"]}</Text>
                 <Text style={styles.modalText}>
-                  Weight: {scannedData["weight"]}
+                  Fat: {scannedData["fat"]} grams
+                </Text>
+                <Text style={styles.modalText}>
+                  Weight: {scannedData["weight"]} grams
                 </Text>
                 <View style={styles.row}>
                   <Pressable

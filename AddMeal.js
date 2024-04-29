@@ -11,6 +11,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function AddMeal({ navigation: { navigate } }) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -22,18 +23,34 @@ export default function AddMeal({ navigation: { navigate } }) {
   const [allItems, setAllItems] = useState([]);
   const [gottenAllItems, setGottenAllItems] = useState(false);
 
+  const getPhoneNumber = async () => {
+    const value = await AsyncStorage.getItem("number");
+    return value;
+  };
+
   const geturl = apiUrl + "/api/getItems";
   const getItemsAsync = async () => {
     try {
       const response = await fetch(geturl);
       const json = await response.json();
       if (json) {
-        setAllItems(json);
+        let number = await getPhoneNumber();
+        if (number && number != "0") {
+          let items = [];
+          console.log(json);
+          for (let i = 0; i < json.length; i++) {
+            if (json[i]["user"] && json[i]["user"] == number) {
+              items.push(json[i]);
+            }
+          }
+          console.log(items);
+          setAllItems(items);
+        } else {
+          setAllItems(json);
+        }
         setGottenAllItems(true);
       }
-    } catch (error) {
-      // console.error(error);
-    }
+    } catch (error) {}
   };
 
   if (!gottenAllItems) {
@@ -114,7 +131,7 @@ export default function AddMeal({ navigation: { navigate } }) {
             let quantityId = `itemQuantity${index + 1}`;
             let quantityLabel = `Item ${index + 1} Quantity (grams)`;
             return (
-              <View key={index}>
+              <View key={quantityId}>
                 <View style={styles.itemContainer}>
                   <View style={styles.item}>
                     <TouchableOpacity
@@ -140,7 +157,7 @@ export default function AddMeal({ navigation: { navigate } }) {
                         placeholder={quantityLabel}
                         style={[styles.input, styles.item]}
                         keyboardType="numeric"
-                        maxLength={2}
+                        maxLength={5}
                         value={value}
                         onChangeText={onChange}
                         onBlur={onBlur}

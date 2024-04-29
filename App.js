@@ -18,6 +18,7 @@ import Settings from "./Settings";
 import Meals from "./Meals";
 import NewInventoryItem from "./NewInventoryItem";
 import AddMeal from "./AddMeal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -54,10 +55,10 @@ function HomeTabs() {
         }}
       />
       <Tab.Screen
-        name="Profile"
+        name="Statistics"
         component={Settings}
         options={{
-          tabBarLabel: "Profile",
+          tabBarLabel: "Statistics",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="account-settings-outline"
@@ -73,6 +74,13 @@ function HomeTabs() {
 
 export default function App() {
   const [phoneNumber, setPhoneNumber] = useState(null);
+  const getPhoneNumber = async () => {
+    const value = await AsyncStorage.getItem("number");
+    setPhoneNumber(value);
+    return value;
+  };
+
+  getPhoneNumber();
 
   function Login() {
     const {
@@ -80,7 +88,8 @@ export default function App() {
       handleSubmit,
       formState: { errors },
     } = useForm();
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
+      await AsyncStorage.setItem("number", data.phone);
       setPhoneNumber(data.phone);
     };
 

@@ -8,8 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-
-const api = "https://application-mock-server.loca.lt";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Inventory({ route, navigation: { navigate } }) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -18,18 +17,32 @@ export default function Inventory({ route, navigation: { navigate } }) {
   const [items, setItems] = useState([]);
   const [gottenItems, setGottenItems] = useState(false);
 
-  const geturl = apiUrl + "/api/getItems";
+  const getPhoneNumber = async () => {
+    const value = await AsyncStorage.getItem("number");
+    return value;
+  };
+
   const getItemsAsync = async () => {
     try {
+      const geturl = apiUrl + "/api/getItems";
       const response = await fetch(geturl);
       const json = await response.json();
       if (json) {
-        setItems(json);
+        let number = await getPhoneNumber();
+        if (number && number != "0") {
+          let items = [];
+          for (let i = 0; i < json.length; i++) {
+            if (json[i]["user"] && json[i]["user"] == number) {
+              items.push(json[i]);
+            }
+          }
+          setItems(items);
+        } else {
+          setItems(json);
+        }
         setGottenItems(true);
       }
-    } catch (error) {
-      // console.error(error);
-    }
+    } catch (error) {}
   };
 
   if (!gottenItems) {
@@ -40,6 +53,7 @@ export default function Inventory({ route, navigation: { navigate } }) {
     const url = apiUrl + "/api/addItem";
     const addItemToApiAsync = async () => {
       try {
+        item["user"] = await getPhoneNumber();
         const response = await fetch(url, {
           method: "POST",
           headers: {
@@ -75,7 +89,8 @@ export default function Inventory({ route, navigation: { navigate } }) {
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
       )}
-      {items &&
+      {gottenItems &&
+        items &&
         items.map((item, index) => (
           <View style={styles.container} key={index}>
             <Text style={styles.bigText}>{item.name}</Text>
@@ -93,6 +108,9 @@ export default function Inventory({ route, navigation: { navigate } }) {
             </Text>
           </View>
         ))}
+      {gottenItems && (!items || items.length == 0) && (
+        <Text>No items have been added.</Text>
+      )}
     </ScrollView>
   );
 }

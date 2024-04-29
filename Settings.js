@@ -6,11 +6,17 @@ import {
   View,
   ActivityIndicator,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Settings() {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const [meals, setMeals] = useState([]);
   const [gottenMeals, setGottenMeals] = useState(false);
+
+  const getPhoneNumber = async () => {
+    const value = await AsyncStorage.getItem("number");
+    return value;
+  };
 
   const geturl = apiUrl + "/api/getMeals";
   const getMealsAsync = async () => {
@@ -18,7 +24,18 @@ export default function Settings() {
       const response = await fetch(geturl);
       const json = await response.json();
       if (json) {
-        setMeals(json);
+        let number = await getPhoneNumber();
+        if (number && number != "0") {
+          let items = [];
+          for (let i = 0; i < json.length; i++) {
+            if (json[i]["user"] && json[i]["user"] == number) {
+              items.push(json[i]);
+            }
+          }
+          setMeals(items);
+        } else {
+          setMeals(json);
+        }
         setGottenMeals(true);
       }
     } catch (error) {}

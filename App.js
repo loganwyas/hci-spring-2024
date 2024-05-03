@@ -1,44 +1,46 @@
-import { useState } from "react";
-import {
-  Button,
-  StyleSheet,
-  Text,
-  TextInput,
-  Pressable,
-  View,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// Import the components for the main application
 import Inventory from "./Inventory";
 import Camera from "./Camera";
 import Settings from "./Settings";
 import Meals from "./Meals";
 import NewInventoryItem from "./NewInventoryItem";
 import AddMeal from "./AddMeal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+// Main App component
 export default function App() {
   const [phoneNumber, setPhoneNumber] = useState(null);
-  const getPhoneNumber = async () => {
-    const value = await AsyncStorage.getItem("number");
-    setPhoneNumber(value);
-    return value;
-  };
 
-  getPhoneNumber();
+  // Function to retrieve phone number from AsyncStorage
+  useEffect(() => {
+    const getPhoneNumber = async () => {
+      const value = await AsyncStorage.getItem("number");
+      setPhoneNumber(value);
+    };
 
+    getPhoneNumber();
+  }, []);
+
+  // Login component for entering phone number
   function Login() {
     const {
       control,
       handleSubmit,
       formState: { errors },
     } = useForm();
+
+    // Function to handle form submission
     const onSubmit = async (data) => {
       await AsyncStorage.setItem("number", data.phone);
       setPhoneNumber(data.phone);
@@ -46,6 +48,8 @@ export default function App() {
 
     return (
       <View style={styles.container}>
+        <Text style={styles.introText}>Welcome to Your Nutrition Tracker!</Text>
+        <Text style={styles.description}>Please enter your phone number:</Text>
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -61,7 +65,7 @@ export default function App() {
           )}
           name="phone"
           rules={{
-            required: "You must enter your phone number to get your data",
+            required: "You must enter your phone number to continue",
           }}
         />
         {errors.phone && (
@@ -73,6 +77,7 @@ export default function App() {
     );
   }
 
+  // Define the main application tabs
   function HomeTabs() {
     return (
       <Tab.Navigator>
@@ -127,7 +132,15 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {phoneNumber && (
+        {!phoneNumber ? (
+          // Render Login component if phone number is not set
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false }}
+          />
+        ) : (
+          // Render HomeTabs if phone number is set
           <>
             <Stack.Screen
               name="Home"
@@ -139,31 +152,35 @@ export default function App() {
             <Stack.Screen name="Create Meal" component={AddMeal} />
           </>
         )}
-        {!phoneNumber && (
-          <>
-            <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{ headerShown: false }}
-            />
-          </>
-        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
-    padding: 50,
-    paddingTop: 100,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  introText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  description: {
+    fontSize: 16,
+    marginBottom: 10,
   },
   input: {
+    width: "100%",
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 10,
-    padding: 8,
+    paddingHorizontal: 10,
   },
   errorText: {
     color: "red",

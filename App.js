@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -23,56 +17,6 @@ import AddMeal from "./AddMeal";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
-// Define the main application tabs
-function HomeTabs() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="Inventory"
-        component={Inventory}
-        options={{
-          tabBarLabel: "Inventory",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="shopping-outline"
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Meals"
-        component={Meals}
-        options={{
-          tabBarLabel: "Meals",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="food-outline"
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Statistics"
-        component={Settings}
-        options={{
-          tabBarLabel: "Statistics",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="account-settings-outline"
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-}
 
 // Main App component
 export default function App() {
@@ -130,6 +74,58 @@ export default function App() {
 
         <Button title="Get Started" onPress={handleSubmit(onSubmit)} />
       </View>
+    );
+  }
+
+  // Define the main application tabs
+  function HomeTabs() {
+    return (
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Inventory"
+          component={Inventory}
+          options={{
+            tabBarLabel: "Inventory",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="shopping-outline"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Meals"
+          component={Meals}
+          options={{
+            tabBarLabel: "Meals",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="food-outline"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Statistics"
+          children={(props) => (
+            <Settings setPhoneNumber={setPhoneNumber} {...props} />
+          )}
+          options={{
+            tabBarLabel: "Statistics",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="account-settings-outline"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+      </Tab.Navigator>
     );
   }
 

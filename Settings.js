@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Settings() {
+export default function Settings({ navigation: { navigate }, setPhoneNumber }) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const [meals, setMeals] = useState([]);
   const [gottenMeals, setGottenMeals] = useState(false);
@@ -16,6 +16,11 @@ export default function Settings() {
   const getPhoneNumber = async () => {
     const value = await AsyncStorage.getItem("number");
     return value;
+  };
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("number");
+    setPhoneNumber(null);
   };
 
   const geturl = apiUrl + "/api/getMeals";
@@ -117,6 +122,9 @@ export default function Settings() {
           </View>
         </View>
       )}
+      <View style={styles.row}>
+        <Button title="Logout" onPress={() => logout()} />
+      </View>
     </View>
   );
 }

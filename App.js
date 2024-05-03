@@ -23,55 +23,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-function HomeTabs() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="Inventory"
-        component={Inventory}
-        options={{
-          tabBarLabel: "Inventory",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="shopping-outline"
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Meals"
-        component={Meals}
-        options={{
-          tabBarLabel: "Meals",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="food-outline"
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Statistics"
-        component={Settings}
-        options={{
-          tabBarLabel: "Statistics",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="account-settings-outline"
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-}
-
 export default function App() {
   const [phoneNumber, setPhoneNumber] = useState(null);
   const getPhoneNumber = async () => {
@@ -119,6 +70,57 @@ export default function App() {
 
         <Button title="Get Started" onPress={handleSubmit(onSubmit)} />
       </View>
+    );
+  }
+
+  function HomeTabs() {
+    return (
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Inventory"
+          component={Inventory}
+          options={{
+            tabBarLabel: "Inventory",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="shopping-outline"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Meals"
+          component={Meals}
+          options={{
+            tabBarLabel: "Meals",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="food-outline"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Statistics"
+          children={(props) => (
+            <Settings setPhoneNumber={setPhoneNumber} {...props} />
+          )}
+          options={{
+            tabBarLabel: "Statistics",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="account-settings-outline"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+      </Tab.Navigator>
     );
   }
 

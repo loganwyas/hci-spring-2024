@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Settings() {
+export default function Settings({ navigation: { navigate }, setPhoneNumber }) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const [meals, setMeals] = useState([]);
   const [gottenMeals, setGottenMeals] = useState(false);
@@ -20,6 +20,7 @@ export default function Settings() {
 
   const logout = async () => {
     await AsyncStorage.removeItem("number");
+    setPhoneNumber(null);
   };
 
   const geturl = apiUrl + "/api/getMeals";

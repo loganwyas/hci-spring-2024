@@ -19,6 +19,8 @@ import Meals from "./Meals";
 import NewInventoryItem from "./NewInventoryItem";
 import AddMeal from "./AddMeal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Userprofile from "./Userprofile";
+import Profile from "./Profile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -59,6 +61,20 @@ function HomeTabs() {
         component={Settings}
         options={{
           tabBarLabel: "Statistics",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="account-settings-outline"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarLabel: "Profile",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="account-settings-outline"

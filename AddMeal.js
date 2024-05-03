@@ -37,13 +37,11 @@ export default function AddMeal({ navigation: { navigate } }) {
         let number = await getPhoneNumber();
         if (number && number != "0") {
           let items = [];
-          console.log(json);
           for (let i = 0; i < json.length; i++) {
             if (json[i]["user"] && json[i]["user"] == number) {
               items.push(json[i]);
             }
           }
-          console.log(items);
           setAllItems(items);
         } else {
           setAllItems(json);

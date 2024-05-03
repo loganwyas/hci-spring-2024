@@ -16,19 +16,23 @@ export default function Userprofile({ navigation: { navigate } }) {
     name: "",
     email: "",
     Address: "",
-    height:"",
-    weight:"",
+    height: "",
+    weight: "",
   });
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
 
   useEffect(() => {
     getUserData();
-    
   }, []);
+
+  useEffect(() => {
+    reset(userData);
+  }, [userData]);
 
   const getPhoneNumber = async () => {
     const value = await AsyncStorage.getItem("number");
@@ -38,12 +42,17 @@ export default function Userprofile({ navigation: { navigate } }) {
   const getUserData = async () => {
     try {
       const userPhoneNumber = await getPhoneNumber();
-      const response = await fetch(`${apiUrl}/api/getUserProfile?phoneNumber=${userPhoneNumber}`);
+      const response = await fetch(
+        `${apiUrl}/api/getUserProfile?phoneNumber=${userPhoneNumber}`
+      );
       if (response.ok) {
         const data = await response.json();
-        if (data) {
-          setUserData(data);
-          console.log(userData);
+        let val = null;
+        for (let i = 0; i < data.length; i++) {
+          if (data[i]["user"] == userPhoneNumber) val = data[i];
+        }
+        if (val) {
+          setUserData(val);
         }
       } else {
         console.error("Failed to fetch user data:", response.status);
@@ -56,8 +65,6 @@ export default function Userprofile({ navigation: { navigate } }) {
   };
 
   const onSubmit = async (data) => {
-    console.log("Form data:", data);
-
     // Fetch user phone number
     const userPhoneNumber = await getPhoneNumber();
 
@@ -73,28 +80,37 @@ export default function Userprofile({ navigation: { navigate } }) {
 
     try {
       let method = "POST"; // Default to POST
-  
+
       // Check if user data already exists
-      const responseExists = await fetch(`${apiUrl}/api/UserProfile?phoneNumber=${userPhoneNumber}`);
+      const responseExists = await fetch(
+        `${apiUrl}/api/UserProfile?phoneNumber=${userPhoneNumber}`
+      );
       if (responseExists.ok) {
         const existingData = await responseExists.json();
         if (existingData) {
           method = "PUT"; // Change method to PUT for update
         }
       }
-  
-      const submitResponse = await fetch(`${apiUrl}/api/UserProfile?phoneNumber=${userPhoneNumber}`, {
-        method: method,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userdata),
-      });
-  
+
+      const submitResponse = await fetch(
+        `${apiUrl}/api/UserProfile?phoneNumber=${userPhoneNumber}`,
+        {
+          method: method,
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userdata),
+        }
+      );
+
       if (submitResponse.ok) {
         // Handle success
-        console.log(method === "POST" ? "Data submitted successfully." : "Data updated successfully.");
+        console.log(
+          method === "POST"
+            ? "Data submitted successfully."
+            : "Data updated successfully."
+        );
       } else {
         console.error("Failed to submit data:", submitResponse.status);
         // Handle failure to submit data
@@ -106,7 +122,6 @@ export default function Userprofile({ navigation: { navigate } }) {
   };
 
   return (
-
     <SafeAreaView>
       <View style={styles.container}>
         <Controller
@@ -209,7 +224,6 @@ export default function Userprofile({ navigation: { navigate } }) {
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

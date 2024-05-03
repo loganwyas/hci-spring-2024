@@ -102,10 +102,10 @@ app.post("/api/addItem", multer().none(), (request, response) => {
   });
 });
 
-//this get request is for user items
-app.get("/api/getItems", (request, response) => {
+///this get request is for user meals
+app.get("/api/getUserProfile", (request, response) => {
   database
-    .collection("NewMealItem")
+    .collection("UserProfile")
     .find({})
     .toArray((error, result) => {
       if (error) {
@@ -117,6 +117,8 @@ app.get("/api/getItems", (request, response) => {
       }
     });
 });
+
+
 
 
 
@@ -143,20 +145,6 @@ app.post("/api/UserProfile", multer().none(), (request, response) => {
   });
 });
 
-//this get request is for user items
-app.get("/api/getUserprofile", (request, response) => {
-  database
-    .collection("UserProfile")
-    .find({})
-    .toArray((error, result) => {
-      if (error) {
-        console.error("Error retrieving data from MongoDB:", error);
-        response.status(500).send("Internal Server Error");
-      } else {
-        // Send the result as a response
-        response.send(result);
-      }
-    });
-});
+
 
 module.exports = app;

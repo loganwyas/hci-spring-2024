@@ -43,7 +43,7 @@ export default function Userprofile({ navigation: { navigate } }) {
         const data = await response.json();
         if (data) {
           setUserData(data);
-          console.log(userData);
+         console.log(userData);
         }
       } else {
         console.error("Failed to fetch user data:", response.status);

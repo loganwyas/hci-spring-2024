@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Meals from "./Meals";
 
 export default function Settings() {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -33,16 +34,20 @@ export default function Settings() {
             }
           }
           setMeals(items);
+          
         } else {
           setMeals(json);
         }
         setGottenMeals(true);
+      
+        console.log(meals);
       }
     } catch (error) {}
   };
 
   if (!gottenMeals) {
     getMealsAsync();
+    console.log(meals);
   }
 
   function calculateValue(property) {

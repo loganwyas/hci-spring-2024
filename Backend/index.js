@@ -118,4 +118,45 @@ app.get("/api/getItems", (request, response) => {
     });
 });
 
+
+
+
+// this post request is for creating the meals data to database
+app.post("/api/UserProfile", multer().none(), (request, response) => {
+  database.collection("UserProfile").countDocuments({}, (error, numofDocs) => {
+    if (error) {
+      console.error("Error counting documents:", error);
+      response.status(500).send("Internal Server Error");
+    } else {
+      const body = request.body;
+
+      database.collection("UserProfile").insertOne(body, (insertError) => {
+        if (insertError) {
+          console.error("Error adding :", insertError);
+          response.status(500).send("Internal Server Error");
+        } else {
+          console.log(body);
+          response.json(" added successfully");
+        }
+      });
+    }
+  });
+});
+
+//this get request is for user items
+app.get("/api/getUserprofile", (request, response) => {
+  database
+    .collection("UserProfile")
+    .find({})
+    .toArray((error, result) => {
+      if (error) {
+        console.error("Error retrieving data from MongoDB:", error);
+        response.status(500).send("Internal Server Error");
+      } else {
+        // Send the result as a response
+        response.send(result);
+      }
+    });
+});
+
 module.exports = app;

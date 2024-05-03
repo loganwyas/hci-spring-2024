@@ -1,104 +1,193 @@
-import React, { Component } from 'react';
-import { AsyncStorage } from '@react-native-async-storage/async-storage';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useState, useEffect } from "react";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      phoneNumber: null,
-    };
-  }
+// Import the components for the main application
+import Inventory from "./Inventory";
+import Camera from "./Camera";
+import Settings from "./Settings";
+import Meals from "./Meals";
+import NewInventoryItem from "./NewInventoryItem";
+import AddMeal from "./AddMeal";
 
-  componentDidMount() {
-    this.getPhoneNumber();
-  }
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-  getPhoneNumber = async () => {
-    const value = await AsyncStorage.getItem('number');
-    this.setState({ phoneNumber: value });
-  };
-
-  render() {
-    const { phoneNumber } = this.state;
-
-    if (!phoneNumber) {
-      return <Login setPhoneNumber={this.setPhoneNumber} />;
-    }
-
-    return (
-      <View style={styles.container}>
-        <Text>Welcome to Your Nutrition Tracker!</Text>
-        <Text>You are logged in with phone number: {phoneNumber}</Text>
-        {/* Navigation and other components go here */}
-        <Button title="Logout" onPress={() => AsyncStorage.removeItem('number').then(() => this.setState({ phoneNumber: null }))} />
-      </View>
-    );
-  }
+// Define the main application tabs
+function HomeTabs() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen
+        name="Inventory"
+        component={Inventory}
+        options={{
+          tabBarLabel: "Inventory",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="shopping-outline"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Meals"
+        component={Meals}
+        options={{
+          tabBarLabel: "Meals",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="food-outline"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Statistics"
+        component={Settings}
+        options={{
+          tabBarLabel: "Statistics",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="account-settings-outline"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
 }
 
-class Login extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      phone: '',
-      error: '',
+// Main App component
+export default function App() {
+  const [phoneNumber, setPhoneNumber] = useState(null);
+
+  // Function to retrieve phone number from AsyncStorage
+  useEffect(() => {
+    const getPhoneNumber = async () => {
+      const value = await AsyncStorage.getItem("number");
+      setPhoneNumber(value);
     };
-  }
 
-  handleSubmit = async () => {
-    const { phone } = this.state;
-    if (!phone) {
-      this.setState({ error: 'You must enter your phone number to get your data' });
-      return;
-    }
+    getPhoneNumber();
+  }, []);
 
-    await AsyncStorage.setItem('number', phone);
-    this.props.setPhoneNumber(phone);
-  };
+  // Login component for entering phone number
+  function Login() {
+    const {
+      control,
+      handleSubmit,
+      formState: { errors },
+    } = useForm();
 
-  render() {
-    const { phone, error } = this.state;
+    // Function to handle form submission
+    const onSubmit = async (data) => {
+      await AsyncStorage.setItem("number", data.phone);
+      setPhoneNumber(data.phone);
+    };
 
     return (
       <View style={styles.container}>
-        <Text>Welcome to Your Nutrition Tracker!</Text>
-        <Text>Please enter your phone number below to get started:</Text>
-        <TextInput
-          placeholder="Phone Number"
-          style={styles.input}
-          keyboardType="numeric"
-          maxLength={10}
-          value={phone}
-          onChangeText={(text) => this.setState({ phone: text })}
+        <Text style={styles.introText}>Welcome to Your Nutrition Tracker!</Text>
+        <Text style={styles.description}>Please enter your phone number:</Text>
+        <Controller
+          control={control}
+          render={({ field: { value, onChange, onBlur } }) => (
+            <TextInput
+              placeholder="Phone Number"
+              style={styles.input}
+              keyboardType="numeric"
+              maxLength={10}
+              value={value}
+              onChangeText={onChange}
+              onBlur={onBlur}
+            />
+          )}
+          name="phone"
+          rules={{
+            required: "You must enter your phone number to continue",
+          }}
         />
-        {error && <Text style={styles.errorText}>{error}</Text>}
+        {errors.phone && (
+          <Text style={styles.errorText}>{errors.phone.message}</Text>
+        )}
 
-        <Button title="Get Started" onPress={this.handleSubmit} />
+        <Button title="Get Started" onPress={handleSubmit(onSubmit)} />
       </View>
     );
   }
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        {!phoneNumber ? (
+          // Render Login component if phone number is not set
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false }}
+          />
+        ) : (
+          // Render HomeTabs if phone number is set
+          <>
+            <Stack.Screen
+              name="Home"
+              component={HomeTabs}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="Barcode Scanner" component={Camera} />
+            <Stack.Screen name="Add New Item" component={NewInventoryItem} />
+            <Stack.Screen name="Create Meal" component={AddMeal} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
+  introText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  description: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
   input: {
+    width: "100%",
     height: 40,
-    width: '100%',
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginBottom: 10,
-    padding: 8,
+    paddingHorizontal: 10,
   },
   errorText: {
-    color: 'red',
+    color: "red",
     marginBottom: 10,
   },
 });
-
-export default App;

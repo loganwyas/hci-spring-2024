@@ -9,7 +9,11 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Profile({ route, navigation: { navigate } }) {
+export default function Profile({
+  route,
+  navigation: { navigate },
+  setPhoneNumber,
+}) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const { data } = route.params ?? { data: null };
   const [userData, setUserData] = useState({
@@ -19,6 +23,11 @@ export default function Profile({ route, navigation: { navigate } }) {
     height: null,
     weight: null,
   });
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("number");
+    setPhoneNumber(null);
+  };
 
   useEffect(() => {
     getUserData();
@@ -68,6 +77,9 @@ export default function Profile({ route, navigation: { navigate } }) {
       <Text style={styles.bigText}>Address: {userData.Address ?? "N/A"}</Text>
       <Text style={styles.bigText}>Height: {userData.height ?? "N/A"}</Text>
       <Text style={styles.bigText}>Weight: {userData.weight ?? "N/A"}</Text>
+      <View style={styles.row}>
+        <Button title="Logout" onPress={() => logout()} />
+      </View>
     </View>
   );
 }

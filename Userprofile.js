@@ -111,6 +111,7 @@ export default function Userprofile({ navigation: { navigate } }) {
             ? "Data submitted successfully."
             : "Data updated successfully."
         );
+        navigate("Profile", { data: userdata });
       } else {
         console.error("Failed to submit data:", submitResponse.status);
         // Handle failure to submit data

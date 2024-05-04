@@ -9,8 +9,9 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Profile({ navigation: { navigate } }) {
+export default function Profile({ route, navigation: { navigate } }) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  const { data } = route.params ?? { data: null };
   const [userData, setUserData] = useState({
     name: null,
     email: null,
@@ -21,7 +22,7 @@ export default function Profile({ navigation: { navigate } }) {
 
   useEffect(() => {
     getUserData();
-  }, []);
+  }, [data]);
 
   const getPhoneNumber = async () => {
     const value = await AsyncStorage.getItem("number");
@@ -29,6 +30,10 @@ export default function Profile({ navigation: { navigate } }) {
   };
 
   const getUserData = async () => {
+    if (data) {
+      setUserData(data);
+      return;
+    }
     try {
       const userPhoneNumber = await getPhoneNumber();
       const response = await fetch(
@@ -55,11 +60,14 @@ export default function Profile({ navigation: { navigate } }) {
 
   return (
     <View style={styles.container}>
-      <Text>Name: {userData.name ?? "N/A"}</Text>
-      <Text>Email: {userData.email ?? "N/A"}</Text>
-      <Text>Address: {userData.Address ?? "N/A"}</Text>
-      <Text>Height: {userData.height ?? "N/A"}</Text>
-      <Text>Weight: {userData.weight ?? "N/A"}</Text>
+      <View style={styles.row}>
+        <Button title="Edit Profile" onPress={() => navigate("Edit Profile")} />
+      </View>
+      <Text style={styles.bigText}>Name: {userData.name ?? "N/A"}</Text>
+      <Text style={styles.bigText}>Email: {userData.email ?? "N/A"}</Text>
+      <Text style={styles.bigText}>Address: {userData.Address ?? "N/A"}</Text>
+      <Text style={styles.bigText}>Height: {userData.height ?? "N/A"}</Text>
+      <Text style={styles.bigText}>Weight: {userData.weight ?? "N/A"}</Text>
     </View>
   );
 }
@@ -68,15 +76,8 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
   },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 10,
-    padding: 8,
-  },
-  errorText: {
-    color: "red",
-    marginBottom: 10,
+  bigText: {
+    fontSize: 20,
+    margin: 10,
   },
 });

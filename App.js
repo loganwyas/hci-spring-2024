@@ -63,7 +63,7 @@ function HomeTabs() {
           tabBarLabel: "Statistics",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
-              name="account-settings-outline"
+              name="chart-box-outline"
               color={color}
               size={size}
             />
@@ -151,6 +151,7 @@ export default function App() {
             <Stack.Screen name="Barcode Scanner" component={Camera} />
             <Stack.Screen name="Add New Item" component={NewInventoryItem} />
             <Stack.Screen name="Create Meal" component={AddMeal} />
+            <Stack.Screen name="Edit Profile" component={Userprofile} />
           </>
         )}
         {!phoneNumber && (

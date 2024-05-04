@@ -14,6 +14,8 @@ import Settings from "./Settings";
 import Meals from "./Meals";
 import NewInventoryItem from "./NewInventoryItem";
 import AddMeal from "./AddMeal";
+import Userprofile from "./Userprofile";
+import Profile from "./Profile";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -111,11 +113,25 @@ export default function App() {
         />
         <Tab.Screen
           name="Statistics"
-          children={(props) => (
-            <Settings setPhoneNumber={setPhoneNumber} {...props} />
-          )}
+          component={Settings}
           options={{
             tabBarLabel: "Statistics",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="chart-box-outline"
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          children={(props) => (
+            <Profile setPhoneNumber={setPhoneNumber} {...props} />
+          )}
+          options={{
+            tabBarLabel: "Profile",
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons
                 name="account-settings-outline"
@@ -150,6 +166,7 @@ export default function App() {
             <Stack.Screen name="Barcode Scanner" component={Camera} />
             <Stack.Screen name="Add New Item" component={NewInventoryItem} />
             <Stack.Screen name="Create Meal" component={AddMeal} />
+            <Stack.Screen name="Edit Profile" component={Userprofile} />
           </>
         )}
       </Stack.Navigator>

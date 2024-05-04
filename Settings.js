@@ -18,11 +18,6 @@ export default function Settings({ navigation: { navigate }, setPhoneNumber }) {
     return value;
   };
 
-  const logout = async () => {
-    await AsyncStorage.removeItem("number");
-    setPhoneNumber(null);
-  };
-
   const geturl = apiUrl + "/api/getMeals";
   const getMealsAsync = async () => {
     try {
@@ -122,9 +117,6 @@ export default function Settings({ navigation: { navigate }, setPhoneNumber }) {
           </View>
         </View>
       )}
-      <View style={styles.row}>
-        <Button title="Logout" onPress={() => logout()} />
-      </View>
     </View>
   );
 }

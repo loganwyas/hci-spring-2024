@@ -15,6 +15,7 @@ export default function NewInventoryItem({ navigation: { navigate } }) {
     formState: { errors },
   } = useForm();
 
+  // Calculate nutritional info based on what the user entered and send the data
   const onSubmit = (data) => {
     let item = {
       name: data.name,
@@ -29,6 +30,7 @@ export default function NewInventoryItem({ navigation: { navigate } }) {
   return (
     <SafeAreaView>
       <View style={styles.container}>
+        {/* Textbox for entering the item's name */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -47,6 +49,7 @@ export default function NewInventoryItem({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.name.message}</Text>
         )}
 
+        {/* Textbox for entering the item's serving size */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -67,6 +70,7 @@ export default function NewInventoryItem({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.size.message}</Text>
         )}
 
+        {/* Textbox for entering the item's number of servings */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -87,6 +91,7 @@ export default function NewInventoryItem({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.servings.message}</Text>
         )}
 
+        {/* Textbox for entering the item's calorie count */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -107,6 +112,7 @@ export default function NewInventoryItem({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.calories.message}</Text>
         )}
 
+        {/* Textbox for entering the item's fat content */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -127,6 +133,7 @@ export default function NewInventoryItem({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.fat.message}</Text>
         )}
 
+        {/* Textbox for entering the item's sugar content */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -153,6 +160,7 @@ export default function NewInventoryItem({ navigation: { navigate } }) {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     padding: 16,

@@ -24,6 +24,7 @@ export default function Profile({
     weight: null,
   });
 
+  // Logs the user out
   const logout = async () => {
     await AsyncStorage.removeItem("number");
     setPhoneNumber(null);
@@ -33,11 +34,13 @@ export default function Profile({
     getUserData();
   }, [data]);
 
+  // Gets phone number from stored data
   const getPhoneNumber = async () => {
     const value = await AsyncStorage.getItem("number");
     return value;
   };
 
+  // Gets all of the user's profile data
   const getUserData = async () => {
     if (data) {
       setUserData(data);
@@ -84,6 +87,7 @@ export default function Profile({
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     padding: 16,

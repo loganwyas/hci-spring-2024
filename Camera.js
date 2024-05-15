@@ -15,11 +15,13 @@ export default function Camera({ navigation: { navigate } }) {
   const [scannedData, setScannedData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  // Navigate to manual entry if item doesn't exist
   function goToManualEntry() {
     setModalVisible(false);
     navigate("Add New Item");
   }
 
+  // Takes the nutritional info and sends it
   function addItem() {
     setModalVisible(false);
     navigate("Inventory", { item: scannedData });
@@ -27,6 +29,7 @@ export default function Camera({ navigation: { navigate } }) {
 
   return (
     <View style={styles.container}>
+      {/* Barcode scanner display */}
       <CameraView
         style={styles.camera}
         facing="back"
@@ -74,11 +77,15 @@ export default function Camera({ navigation: { navigate } }) {
           }
         }}
       ></CameraView>
+
+      {/* Display spinner while data is loading */}
       {isFetchingData && (
         <View style={styles.loadingSpinner}>
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
       )}
+
+      {/* Modal to display the received nutritional info */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -149,6 +156,7 @@ export default function Camera({ navigation: { navigate } }) {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,

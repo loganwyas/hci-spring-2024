@@ -23,11 +23,13 @@ export default function AddMeal({ navigation: { navigate } }) {
   const [allItems, setAllItems] = useState([]);
   const [gottenAllItems, setGottenAllItems] = useState(false);
 
+  // Gets phone number from stored data
   const getPhoneNumber = async () => {
     const value = await AsyncStorage.getItem("number");
     return value;
   };
 
+  // Gets all user inventory items from the API
   const geturl = apiUrl + "/api/getItems";
   const getItemsAsync = async () => {
     try {
@@ -73,6 +75,7 @@ export default function AddMeal({ navigation: { navigate } }) {
     setMealDate(currentDate);
   };
 
+  // Adds an inventory item to the meal
   function addItem() {
     setItemDropdowns([...itemDropdowns, false]);
     setItemsConsumed([
@@ -84,6 +87,7 @@ export default function AddMeal({ navigation: { navigate } }) {
   return (
     <ScrollView>
       <View style={styles.form}>
+        {/* Textbox for entering the meal's name */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -102,11 +106,13 @@ export default function AddMeal({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.name.message}</Text>
         )}
 
+        {/* Calendar for selecting the date consumed */}
         <View style={styles.row}>
           <Text>Date Consumed: </Text>
           <DateTimePicker value={mealDate} mode="date" onChange={onChange} />
         </View>
 
+        {/* Dropdown for selecting the meal type */}
         <Text>Meal Type:</Text>
         <TouchableOpacity
           style={styles.dropdown}
@@ -124,6 +130,8 @@ export default function AddMeal({ navigation: { navigate } }) {
             <Picker.Item label="Dinner" value="Dinner" />
           </Picker>
         )}
+
+        {/* Dropdowns for selecting inventory items */}
         {itemDropdowns &&
           itemDropdowns.map((item, index) => {
             let quantityId = `itemQuantity${index + 1}`;
@@ -212,6 +220,7 @@ export default function AddMeal({ navigation: { navigate } }) {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   form: {
     padding: 20,

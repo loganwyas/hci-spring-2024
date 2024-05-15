@@ -17,11 +17,13 @@ export default function Inventory({ route, navigation: { navigate } }) {
   const [items, setItems] = useState([]);
   const [gottenItems, setGottenItems] = useState(false);
 
+  // Gets phone number from stored data
   const getPhoneNumber = async () => {
     const value = await AsyncStorage.getItem("number");
     return value;
   };
 
+  // Gets all user inventory items from the API
   const getItemsAsync = async () => {
     try {
       const geturl = apiUrl + "/api/getItems";
@@ -49,6 +51,7 @@ export default function Inventory({ route, navigation: { navigate } }) {
     getItemsAsync();
   }
 
+  // Checks if a new item is being added
   if (item && items.indexOf(item) == -1) {
     const url = apiUrl + "/api/addItem";
     const addItemToApiAsync = async () => {
@@ -71,6 +74,7 @@ export default function Inventory({ route, navigation: { navigate } }) {
     setItems([...items, item]);
   }
 
+  // Navigate to barcode scanner if user gives permission
   async function startScanning() {
     await requestPermission();
     if (permission) {
@@ -84,11 +88,15 @@ export default function Inventory({ route, navigation: { navigate } }) {
         <Button title="Add Manually" onPress={() => navigate("Add New Item")} />
         <Button title="Add with Barcode" onPress={startScanning} />
       </View>
+
+      {/* Shows a spinner if data hasn't loaded yet */}
       {!gottenItems && (
         <View style={styles.loadingSpinner}>
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
       )}
+
+      {/* Displays items if they exist */}
       {gottenItems &&
         items &&
         items.map((item, index) => (
@@ -108,6 +116,8 @@ export default function Inventory({ route, navigation: { navigate } }) {
             </Text>
           </View>
         ))}
+
+      {/* Displays when no items exist */}
       {gottenItems && (!items || items.length == 0) && (
         <Text>No items have been added.</Text>
       )}
@@ -115,6 +125,7 @@ export default function Inventory({ route, navigation: { navigate } }) {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row",

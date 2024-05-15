@@ -10,11 +10,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // Import the components for the main application
 import Inventory from "./Inventory";
 import Camera from "./Camera";
-import Settings from "./Settings";
+import Statistics from "./Statistics";
 import Meals from "./Meals";
 import NewInventoryItem from "./NewInventoryItem";
 import AddMeal from "./AddMeal";
-import Userprofile from "./Userprofile";
+import EditProfile from "./EditProfile";
 import Profile from "./Profile";
 
 const Tab = createBottomTabNavigator();
@@ -113,7 +113,7 @@ export default function App() {
         />
         <Tab.Screen
           name="Statistics"
-          component={Settings}
+          component={Statistics}
           options={{
             tabBarLabel: "Statistics",
             tabBarIcon: ({ color, size }) => (
@@ -145,6 +145,7 @@ export default function App() {
     );
   }
 
+  // Create the navigation and screens
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -166,7 +167,7 @@ export default function App() {
             <Stack.Screen name="Barcode Scanner" component={Camera} />
             <Stack.Screen name="Add New Item" component={NewInventoryItem} />
             <Stack.Screen name="Create Meal" component={AddMeal} />
-            <Stack.Screen name="Edit Profile" component={Userprofile} />
+            <Stack.Screen name="Edit Profile" component={EditProfile} />
           </>
         )}
       </Stack.Navigator>

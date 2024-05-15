@@ -8,16 +8,21 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function Settings({ navigation: { navigate }, setPhoneNumber }) {
+export default function Statistics({
+  navigation: { navigate },
+  setPhoneNumber,
+}) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const [meals, setMeals] = useState([]);
   const [gottenMeals, setGottenMeals] = useState(false);
 
+  // Gets phone number from stored data
   const getPhoneNumber = async () => {
     const value = await AsyncStorage.getItem("number");
     return value;
   };
 
+  // Gets all user meals from the API
   const geturl = apiUrl + "/api/getMeals";
   const getMealsAsync = async () => {
     try {
@@ -45,6 +50,7 @@ export default function Settings({ navigation: { navigate }, setPhoneNumber }) {
     getMealsAsync();
   }
 
+  //  Calculates statistics
   function calculateValue(property) {
     let value = 0;
     for (let i = 0; i < meals.length; i++) {
@@ -70,11 +76,14 @@ export default function Settings({ navigation: { navigate }, setPhoneNumber }) {
 
   return (
     <View>
+      {/* Shows a spinner if data hasn't loaded yet */}
       {!gottenMeals && (
         <View style={styles.loadingSpinner}>
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
       )}
+
+      {/* Displays meals statistics */}
       {gottenMeals && (
         <View>
           <Text style={[styles.biggestText, styles.centered]}>
@@ -121,6 +130,7 @@ export default function Settings({ navigation: { navigate }, setPhoneNumber }) {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row",

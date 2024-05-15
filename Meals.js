@@ -15,11 +15,13 @@ export default function Meals({ route, navigation: { navigate } }) {
   const [meals, setMeals] = useState([]);
   const [gottenMeals, setGottenMeals] = useState(false);
 
+  // Gets phone number from stored data
   const getPhoneNumber = async () => {
     const value = await AsyncStorage.getItem("number");
     return value;
   };
 
+  // Gets all user meals from the API
   const geturl = apiUrl + "/api/getMeals";
   const getMealsAsync = async () => {
     try {
@@ -47,6 +49,7 @@ export default function Meals({ route, navigation: { navigate } }) {
     getMealsAsync();
   }
 
+  // Checks if a new meal is being added
   if (meal && meals.indexOf(meal) == -1) {
     const url = apiUrl + "/api/createMeal";
     const addMealToApiAsync = async () => {
@@ -74,11 +77,15 @@ export default function Meals({ route, navigation: { navigate } }) {
           onPress={() => navigate("Create Meal")}
         />
       </View>
+
+      {/* Shows a spinner if data hasn't loaded yet */}
       {!gottenMeals && (
         <View style={styles.loadingSpinner}>
           <ActivityIndicator size="large" color="#0000ff" />
         </View>
       )}
+
+      {/* Displays meals if they exist */}
       {gottenMeals &&
         meals &&
         meals.map((meal, index) => {
@@ -112,6 +119,8 @@ export default function Meals({ route, navigation: { navigate } }) {
             </View>
           );
         })}
+
+      {/* Displays when no meals exist */}
       {gottenMeals && (!meals || meals.length == 0) && (
         <Text>No meals have been created.</Text>
       )}
@@ -119,6 +128,7 @@ export default function Meals({ route, navigation: { navigate } }) {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row",

@@ -10,7 +10,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useForm, Controller } from "react-hook-form";
 
-export default function Userprofile({ navigation: { navigate } }) {
+export default function EditProfile({ navigation: { navigate } }) {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const [userData, setUserData] = useState({
     name: "",
@@ -34,11 +34,13 @@ export default function Userprofile({ navigation: { navigate } }) {
     reset(userData);
   }, [userData]);
 
+  // Gets phone number from stored data
   const getPhoneNumber = async () => {
     const value = await AsyncStorage.getItem("number");
     return value;
   };
 
+  // Gets all of the user's profile data
   const getUserData = async () => {
     try {
       const userPhoneNumber = await getPhoneNumber();
@@ -125,6 +127,7 @@ export default function Userprofile({ navigation: { navigate } }) {
   return (
     <SafeAreaView>
       <View style={styles.container}>
+        {/* Textbox for entering the user's name */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -144,6 +147,7 @@ export default function Userprofile({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.name.message}</Text>
         )}
 
+        {/* Textbox for entering the user's email */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -163,6 +167,7 @@ export default function Userprofile({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.email.message}</Text>
         )}
 
+        {/* Textbox for entering the user's address */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -182,6 +187,7 @@ export default function Userprofile({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.Address.message}</Text>
         )}
 
+        {/* Textbox for entering the user's height */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -201,6 +207,7 @@ export default function Userprofile({ navigation: { navigate } }) {
           <Text style={styles.errorText}>{errors.height.message}</Text>
         )}
 
+        {/* Textbox for entering the user's weight */}
         <Controller
           control={control}
           render={({ field: { value, onChange, onBlur } }) => (
@@ -226,6 +233,7 @@ export default function Userprofile({ navigation: { navigate } }) {
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     padding: 16,
